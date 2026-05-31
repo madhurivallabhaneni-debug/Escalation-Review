@@ -16,12 +16,12 @@
     "preparedBy": "Madhuri Vallabhaneni",
     "title": "Manager, Technical Support Engineering",
     "preparedDate": "May 30, 2026",
-    "region": "EMEA · APAC · IST"
+    "region": "EMEA"
   },
 
   "kpis": {
     "total": 5,
-    "qualified": 4,
+    "qualified": 5,
     "miscategorized": 1,
     "clsCorrect": 0,
     "agentMiss": 3,
@@ -210,51 +210,51 @@
       "accountNote": "Strategic ~$1M ACV", "accountNoteStyle": "red",
       "issue": "Platform Event delivery limit — active outage",
       "owner": "Pranav Kumar",
-      "rootCause": "", "rootCauseCorrection": "",
-      "reasonCode": "", "reasonCodeCorrection": "",
-      "escStatus": "", "escStatusCorrection": "",
-      "clStatus": "Not Filled", "clStatusStyle": "red"
+      "rootCause": "", "rootCauseCorrection": "", "rootCauseRecommended": "Product Limitation",
+      "reasonCode": "", "reasonCodeCorrection": "", "reasonCodeRecommended": "Product Related Impact",
+      "escStatus": "", "escStatusCorrection": "Qualified", "escStatusRecommended": "",
+      "clStatus": "Not Filled", "clStatusStyle": "red", "redAccount": false
     },
     {
       "cl": "CL-01354444", "caseNum": "473493471", "account": "GXO Enterprise Services",
       "accountNote": "", "accountNoteStyle": "",
       "issue": "Apex CPU limit exceeded in Flow debug",
       "owner": "Baby Harika Chunduru",
-      "rootCause": "Case Management", "rootCauseCorrection": "",
-      "reasonCode": "Case Progression Impact", "reasonCodeCorrection": "",
-      "escStatus": "", "escStatusCorrection": "",
-      "clStatus": "Partial", "clStatusStyle": "orange"
+      "rootCause": "Case Management", "rootCauseCorrection": "", "rootCauseRecommended": "",
+      "reasonCode": "Case Progression Impact", "reasonCodeCorrection": "", "reasonCodeRecommended": "",
+      "escStatus": "", "escStatusCorrection": "Qualified", "escStatusRecommended": "",
+      "clStatus": "Partial", "clStatusStyle": "orange", "redAccount": false
     },
     {
       "cl": "CL-01353241", "caseNum": "473524651", "account": "Dr. Ausbüttel & Co.",
       "accountNote": "", "accountNoteStyle": "",
       "issue": "Product & Feature Retirement guidance",
       "owner": "Gopal Sai Krishna Inturu",
-      "rootCause": "Business Impact & Urgency", "rootCauseCorrection": "",
-      "reasonCode": "Case Progression Impact", "reasonCodeCorrection": "",
-      "escStatus": "Qualified", "escStatusCorrection": "",
-      "clStatus": "Partial", "clStatusStyle": "orange"
+      "rootCause": "Business Impact & Urgency", "rootCauseCorrection": "", "rootCauseRecommended": "",
+      "reasonCode": "Case Progression Impact", "reasonCodeCorrection": "", "reasonCodeRecommended": "",
+      "escStatus": "Qualified", "escStatusCorrection": "", "escStatusRecommended": "",
+      "clStatus": "Partial", "clStatusStyle": "orange", "redAccount": true
     },
     {
       "cl": "CL-01353162", "caseNum": "473360023", "account": "Stora Enso Oyj",
       "accountNote": "", "accountNoteStyle": "",
       "issue": "QuickActionDefaultsHandler not working",
       "owner": "Abhinav Gupta Korada",
-      "rootCause": "Comprehending Issue", "rootCauseCorrection": "",
-      "reasonCode": "Product Knowledge Impact", "reasonCodeCorrection": "",
-      "escStatus": "", "escStatusCorrection": "",
-      "clStatus": "Partial", "clStatusStyle": "orange"
+      "rootCause": "Comprehending Issue", "rootCauseCorrection": "", "rootCauseRecommended": "",
+      "reasonCode": "Product Knowledge Impact", "reasonCodeCorrection": "", "reasonCodeRecommended": "",
+      "escStatus": "", "escStatusCorrection": "Qualified", "escStatusRecommended": "",
+      "clStatus": "Partial", "clStatusStyle": "orange", "redAccount": true
     },
     {
       "cl": "CL-01352354", "caseNum": "473438645", "account": "Astound Digital",
       "accountNote": "", "accountNoteStyle": "",
       "issue": "SOAP API login() retirement / OAuth auth",
       "owner": "Yallapu Likitha",
-      "rootCause": "Request Out of Scope",   "rootCauseCorrection": "Agent Knowledge",
-      "reasonCode": "Procedural",            "reasonCodeCorrection": "Product Knowledge Impact",
-      "escStatus": "Disqualified",           "escStatusCorrection": "Qualified",
+      "rootCause": "Request Out of Scope",   "rootCauseCorrection": "Agent Knowledge", "rootCauseRecommended": "",
+      "reasonCode": "Procedural",            "reasonCodeCorrection": "Product Knowledge Impact", "reasonCodeRecommended": "",
+      "escStatus": "Disqualified",           "escStatusCorrection": "Qualified", "escStatusRecommended": "",
       "clStatus": "Incorrect", "clStatusStyle": "red",
-      "rowHighlight": true
+      "redAccount": false, "rowHighlight": true
     }
   ],
 
@@ -554,9 +554,11 @@ const $ = id => document.getElementById(id);
 const pill = (text, style) => text
   ? `<span class="pill pill-${style||'grey'}">${text}</span>`
   : `<span class="pill pill-grey">—</span>`;
-const correctionCell = (val, fix) => fix
+const correctionCell = (val, fix, rec) => fix
   ? `<div class="correction-wrap"><span class="correction-old">${val}</span><span class="correction-new">→ ${fix}</span></div>`
-  : (val || `<span class="pill pill-grey">—</span>`);
+  : (rec && !val)
+    ? `<span style="color:var(--orange);font-size:12px;font-weight:500;">${rec} <em style="font-size:10px;font-weight:400;">(recommended)</em></span>`
+    : (val || `<span class="pill pill-grey">—</span>`);
 
 // ─── HEADER ────────────────────────────────────────────────────────────────
 $('hdr').innerHTML = `
@@ -647,12 +649,12 @@ const summaryRows = D.summaryTable.map(r => `
   <tr ${r.rowHighlight ? 'style="background:#fff5f5;"' : ''}>
     <td><strong>${r.cl}</strong></td>
     <td>${r.caseNum}</td>
-    <td><strong>${r.account}</strong>${r.accountNote ? `<br/><span class="pill pill-${r.accountNoteStyle}" style="margin-top:4px;display:inline-block;">${r.accountNote}</span>` : ''}</td>
+    <td><strong>${r.account}</strong>${r.redAccount ? `<br/><span class="pill pill-red" style="margin-top:4px;display:inline-block;">🔴 RED Account</span>` : ''}${r.accountNote ? `<br/><span class="pill pill-${r.accountNoteStyle}" style="margin-top:4px;display:inline-block;">${r.accountNote}</span>` : ''}</td>
     <td>${r.issue}</td>
     <td>${r.owner}</td>
-    <td>${correctionCell(r.rootCause, r.rootCauseCorrection)}</td>
-    <td>${correctionCell(r.reasonCode, r.reasonCodeCorrection)}</td>
-    <td>${correctionCell(r.escStatus, r.escStatusCorrection)}</td>
+    <td>${correctionCell(r.rootCause, r.rootCauseCorrection, r.rootCauseRecommended)}</td>
+    <td>${correctionCell(r.reasonCode, r.reasonCodeCorrection, r.reasonCodeRecommended)}</td>
+    <td>${correctionCell(r.escStatus, r.escStatusCorrection, r.escStatusRecommended)}</td>
     <td>${pill(r.clStatus, r.clStatusStyle)}</td>
   </tr>`).join('');
 
